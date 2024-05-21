@@ -1,9 +1,12 @@
 const express = require("express");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 const { connectToMongoDB } = require("./connect");
 const urlRoute = require("./routes/url");
-const staticRouter = require("./routes/staticRouter");
+const staticRoute = require("./routes/staticRouter");
+const userRoute = require("./routes/user");
 const URL = require("./models/url");
+const { restrictToLoggedinUserOnly, checkAuth } = require("./middlewares/auth");
 
 const app = express();
 const PORT = 8001;
@@ -17,28 +20,37 @@ app.set("view engine", "ejs");
 app.set("views", path.resolve("./views"));
 
 app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-app.use("/url", urlRoute);
-
-app.use("/", staticRouter);
-
+app.use("/url", restrictToLoggedinUserOnly, urlRoute);
+app.use("/user", userRoute);
+app.use("/", checkAuth, staticRoute);
 
 app.get("/url/:shortId", async (req, res) => {
   const shortId = req.params.shortId;
-  const entry = await URL.findOneAndUpdate(
-    {
-      shortId,
-    },
-    {
-      $push: {
-        visitHistory: {
-          timestamp: Date.now(),
+  try {
+    const entry = await URL.findOneAndUpdate(
+      { shortId },
+      {
+        $push: {
+          visitHistory: {
+            timestamp: Date.now(),
+          },
         },
       },
+      { new: true } // This option ensures you get the updated document
+    );
+
+    if (entry) {
+      res.redirect(entry.redirectURL);
+    } else {
+      res.status(404).send("URL not found");
     }
-  );
-  res.redirect(entry.redirectURL);
+  } catch (error) {
+    console.error("Error finding URL entry:", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
 app.listen(PORT, () => console.log(`Server Started at PORT: ${PORT}`));
