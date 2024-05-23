@@ -49,11 +49,12 @@ async function handleGetAnalytics(req, res) {
   if (!result) {
     return res.status(404).json({ error: "URL not found" });
   }
-  return res.json({
+  return res.render("analytics", {
     totalClicks: result.visitHistory.length,
     analytics: result.visitHistory,
   });
 }
+
 async function handleDeleteShortURL(req, res) {
   const shortId = req.params.shortId;
   await URL.deleteOne({ shortId });
@@ -61,5 +62,6 @@ async function handleDeleteShortURL(req, res) {
 }
 module.exports = {
   handleGenerateNewShortURL,
+  handleDeleteShortURL,
   handleGetAnalytics,
 };

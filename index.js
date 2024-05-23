@@ -1,5 +1,6 @@
 require('dotenv').config({path: './.env'})
 const express = require("express");
+require('events').EventEmitter.defaultMaxListeners = 20; // Increase the limit as needed
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const { connectToMongoDB } = require("./connect");
