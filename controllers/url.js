@@ -38,8 +38,8 @@ async function handleGenerateNewShortURL(req, res) {
     createdBy: req.user._id,
   });
 
-  return res.render("home",{
-    id:shortID,
+  return res.render("home", {
+    id: shortID,
   })
 }
 
@@ -54,7 +54,11 @@ async function handleGetAnalytics(req, res) {
     analytics: result.visitHistory,
   });
 }
-
+async function handleDeleteShortURL(req, res) {
+  const shortId = req.params.shortId;
+  await URL.deleteOne({ shortId });
+  return res.redirect("/");
+}
 module.exports = {
   handleGenerateNewShortURL,
   handleGetAnalytics,

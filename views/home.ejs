@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shorten Your URL</title>
-    
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -153,7 +153,8 @@
 
         <div class="short-url">
             <% if (locals.id) { %>
-                <p>Short URL: <a href="http://localhost:8001/url/<%= id %> " target="_blank">http://localhost:8001/<%= id %></a></p>
+                <p>Short URL: <a href="http://localhost:8001/url/<%= id %> " target="_blank">http://localhost:8001/<%=
+                            id %></a></p>
                 <% } %>
         </div>
     </div>
@@ -170,6 +171,7 @@
                         <th>Short URL</th>
                         <th>Redirected URL</th>
                         <th>Visited</th>
+                        <th>last access</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,6 +189,10 @@
                             <td>
                                 <%= url.visitHistory.length %>
                             </td>
+                            <td>
+                                <%=Date(url.visitHistory[url.visitHistory.length -1]).toLocaleString() %>
+                            </td>
+                            
                         </tr>
                         <% }) %>
                 </tbody>
